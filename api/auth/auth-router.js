@@ -40,10 +40,9 @@ router.post('/register', checkPayload, checkUsername, (req, res, next) => {
           res.status(200).json(newUser)
         })
         .catch(next)
-});
+})
 
-router.post('/login', (req, res) => {
-  res.end('implement login, please!');
+router.post('/login', checkPayload, (req, res, next) => {
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -67,7 +66,21 @@ router.post('/login', (req, res) => {
     4- On FAILED login due to `username` not existing in the db, or `password` being incorrect,
       the response body should include a string exactly as follows: "invalid credentials".
   */
-});
+  let { username, password } = req.body
+
+  Users.findBy({ username })
+    .then(([user]) => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        res.status(200).json({
+          message: `welcome, ${user.username}`,
+          token: buildToken(user)
+        })
+      } else {
+        res.status(401).json({ message: 'invalid credentials' })
+      }
+    })
+    .catch(next)
+})
 
 function buildToken(user) {
   const payload = {
@@ -80,4 +93,4 @@ function buildToken(user) {
   return jwt.sign(payload, JWT_SECRET, options)
 }
 
-module.exports = router;
+module.exports = router
