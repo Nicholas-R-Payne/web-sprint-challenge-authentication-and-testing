@@ -29,7 +29,7 @@ describe('[POST] /register', () => {
     result = await Users.findById(1)
     expect(result.username).toBe('Beth')
   })
-  test('accurate response for failed register with duplicate username', async () => {
+  test('accurate message for failed register with duplicate username', async () => {
     const result = await request(server)
       .post('/api/auth/register')
       .send({ username: 'Beth', password: '1234' })
@@ -38,14 +38,14 @@ describe('[POST] /register', () => {
 })
 
 describe('[POST] /login', () => {
-  test('accurate response for successful login', async () => {
-    let result = await request(server)
+  test('accurate message for successful login', async () => {
+    const result = await request(server)
       .post('/api/auth/login')
       .send({ username: 'Beth', password: '1234' })
     expect(result.body.message).toMatch(/welcome, Beth/i)
   })
-  test('accurate response for failed login with wrong password', async () => {
-    let result = await request(server)
+  test('accurate message for failed login with wrong password', async () => {
+    const result = await request(server)
       .post('/api/auth/login')
       .send({ username: 'Beth', password: 'abcd' })
     expect(result.body.message).toMatch(/invalid credentials/i)
@@ -53,10 +53,21 @@ describe('[POST] /login', () => {
 })
 
 describe('[GET] /jokes', () => {
-  test('accurate response for successful request', () => {
-
+  test('accurate status for successful request', async () => {
+    let result = await request(server)
+      .post('/api/auth/register')
+      .send({ username: 'Bob', password: '5678' })
+    result = await request(server)
+      .post('/api/auth/login')
+      .send({ username: 'Bob', password: '5678' })
+    result = await request(server)
+      .get('/api/jokes')
+      .set('Authorization', result.body.token)
+    expect(result.status).toBe(200)
   })
-  test('accurate response for failed request', () => {
-    
+  test('accurate message for failed request', async () => {
+    let result = await request(server)
+      .get('/api/jokes')
+    expect(result.body.message).toMatch(/token required/i)
   })
 })
