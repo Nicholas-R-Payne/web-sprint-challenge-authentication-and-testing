@@ -32,10 +32,10 @@ router.post('/register', checkPayload, checkUsername, (req, res, next) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-      let { username, password } = req.body
-      const hash = bcrypt.hashSync(password, 8)
-      password = hash
-      Users.add({ username, password })
+      const user = req.body
+      const hash = bcrypt.hashSync(user.password, 8)
+      user.password = hash
+      Users.add(user)
         .then(newUser => {
           res.status(200).json(newUser)
         })
