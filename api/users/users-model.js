@@ -20,8 +20,8 @@ function findByUsername(username) {
     .where('username', username)
 }
 
-async function add(user, password) {
-    const [id] = await db('users').insert(user, password)
+async function add(user) {
+    const [id] = await db('users').insert(user)
     return findById(id)
 }
 

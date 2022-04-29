@@ -37,7 +37,7 @@ router.post('/register', checkPayload, checkUsername, (req, res, next) => {
 
       Users.add({ username, password: hash })
         .then(newUser => {
-          res.status(200).json(newUser)
+          res.status(200).json({ username: newUser.username, password: newUser.password})
         })
         .catch(next)
 })
